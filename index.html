@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Beruang Antar Surat</title>
+  <style>
+    :root{
+      --bg1: linear-gradient(180deg,#a8e6a3,#d3f9d8);
+      --accent: #e65b8a;
+      --paper: #fffdf2;
+      --brown: #7b4f3a;
+      --light-brown: #c89a78;
+      --green: #3d7d3d;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--bg1);
+      font-family: "Segoe UI", Roboto, system-ui, "Helvetica Neue", Arial;
+      overflow:hidden;
+      padding:20px;
+    }
+
+    .stage{
+      width:100%;
+      max-width:920px;
+      height:640px;
+      position:relative;
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 15px 40px rgba(0,0,0,0.12);
+      background: linear-gradient(180deg,#a8e6a3,#d3f9d8);
+    }
+
+    /* ground */
+    .ground{
+      position:absolute;
+      left:0; right:0;
+      bottom:0;
+      height:140px;
+      background: #5cb85c;
+      box-shadow: inset 0 8px 20px rgba(0,0,0,0.03);
+      z-index:1;
+    }
+
+    /* pohon sederhana */
+    .tree {
+      position:absolute;
+      bottom:140px;
+      left:60px;
+      width:40px;
+      height:120px;
+      background:#8b5a2b;
+      border-radius:10px;
+      z-index:0;
+    }
+    .tree::before{
+      content:"";
+      position:absolute;
+      bottom:100%;
+      left:-40px;
+      width:120px;
+      height:120px;
+      background:var(--green);
+      border-radius:50%;
+      box-shadow:
+        -40px -10px 0 var(--green),
+        40px -10px 0 var(--green),
+        0 -40px 0 var(--green);
+    }
+
+    .bear-wrap {
+      position:absolute;
+      left:-30%;
+      bottom:110px;
+      z-index:6;
+      width:260px;
+      height:300px;
+      transition:transform 0.6s ease;
+      transform-origin:center bottom;
+    }
+    .walk-in {
+      animation: walkin 1.8s cubic-bezier(.2,.9,.2,1) forwards;
+    }
+    @keyframes walkin {
+      to { transform: translateX(38vw); }
+    }
+
+    .bear {
+      position:relative;
+      width:220px;
+      height:260px;
+      margin:auto;
+    }
+    .shadow {
+      position:absolute;
+      bottom:8px;
+      left:50%;
+      transform:translateX(-50%);
+      width:160px;
+      height:28px;
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.12), rgba(0,0,0,0.04));
+      border-radius:50%;
+      filter: blur(2px);
+      z-index:0;
+    }
+    .ear {width:44px;height:44px;background:var(--brown);border-radius:50%;position:absolute; top:16px;}
+    .ear.left { left:40px;} .ear.right { right:40px; }
+    .head {position:absolute;top:28px;left:50%;transform:translateX(-50%);width:140px;height:120px;background:var(--brown);border-radius:50%;z-index:4;}
+    .face {position:absolute;left:50%;transform:translateX(-50%);top:36px;width:95px;height:70px;background:var(--light-brown);border-radius:50%;z-index:5;}
+    .eye{ width:8px;height:8px;background:#111;border-radius:50%;position:absolute;top:24px; }
+    .eye.left{ left:28px } .eye.right{ right:28px; }
+    .nose { position:absolute; left:50%; transform:translateX(-50%); bottom:12px; width:18px;height:12px;background:#221; border-radius:8px; }
+    .body {position:absolute;top:110px;left:50%;transform:translateX(-50%);width:140px;height:140px;background:var(--brown);border-radius:22px;z-index:3;}
+
+    .leg{position:absolute; bottom:-8px; width:40px;height:50px;background:var(--brown); border-radius:20px; z-index:2;}
+    .leg.left { left:42px; animation:legwalk 0.6s infinite ease-in-out; }
+    .leg.right{ right:42px; animation:legwalk 0.6s infinite ease-in-out; animation-delay:0.3s; }
+    @keyframes legwalk {0%{transform: rotate(0deg);}50%{transform: rotate(18deg) translateY(3px);}100%{transform: rotate(0deg);} }
+
+    .arm {position:absolute;width:84px;height:28px;background:var(--light-brown);border-radius:16px;top:128px;left: calc(50% + 10px);display:flex;align-items:center;justify-content:flex-end;padding-right:6px;z-index:6;animation:armbob 0.6s infinite ease-in-out;}
+    @keyframes armbob{0%{ transform: translateY(0) rotate(0deg);}50%{ transform: translateY(-6px) rotate(-6deg);}100%{ transform: translateY(0) rotate(0deg);} }
+    .paw {width:28px;height:28px;background:var(--light-brown); border-radius:50%;margin-right:4px;}
+    .envelope {width:68px;height:44px;background:#fff;border-radius:6px;border:2px solid #e6cfc0;position:relative;cursor:pointer;z-index:7;}
+    .envelope::before{content:""; position:absolute; inset:0; background: linear-gradient(135deg,#fff,#fffaf0); border-radius:6px; clip-path: polygon(0 0, 50% 60%, 100% 0, 100% 100%, 0 100%); opacity:0.95;}
+    .flap {position:absolute; left:0; right:0; top:0; height:44px; transform-origin: top center; transition: transform .45s; z-index:8;}
+    .paper {position:absolute; left:8px; top:8px; width:52px; height:36px; background:var(--paper); border-radius:4px; transform-origin: center top; transition: transform .45s, opacity .45s; z-index:6; opacity:0;}
+    .envelope.open .flap { transform: rotateX(180deg) translateY(-12px); }
+    .envelope.open .paper { opacity:1; transform: translateY(-66px) scale(1); }
+
+    .letter-sheet {position:absolute;width:380px;max-width:86%;height:460px;background:var(--paper);border-radius:14px;left:50%;top:45%;transform: translate(-50%,-30%) scale(0.85);box-shadow:0 18px 50px rgba(0,0,0,0.12);padding:28px;display:none;overflow:hidden;z-index:9;}
+    .letter-sheet.show {display:block;animation:sheetpop .45s forwards;}
+    @keyframes sheetpop{0%{ transform: translate(-50%,-30%) scale(.6); opacity:0;}100%{ transform: translate(-50%,-50%) scale(1); opacity:1; }}
+    .sheet-title { font-weight:700; color:var(--brown); margin:0 0 8px 0; font-size:20px; text-align:center;}
+    .sheet-body { color:#4b3d37; font-size:16px; line-height:1.6; white-space:pre-wrap; height:320px; overflow:auto; padding:6px;}
+
+    .bear-side {position:absolute; bottom:140px; left:10%; width:180px; height:220px; opacity:0; transition:opacity .6s;}
+    .bear-side.show{opacity:1;}
+
+    /* balon percakapan */
+    .speech {
+      position:absolute;
+      bottom:260px;
+      left:36%;
+      background:#fff;
+      padding:12px 16px;
+      border-radius:12px;
+      border:2px solid #7b4f3a;
+      font-weight:600;
+      color:#7b4f3a;
+      max-width:220px;
+      z-index:10;
+    }
+    .speech::after {
+      content:"";
+      position:absolute;
+      bottom:-14px;
+      left:20px;
+      border-width:14px 12px 0;
+      border-style:solid;
+      border-color:#fff transparent transparent transparent;
+      transform:rotate(15deg);
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="tree"></div>
+    <div class="ground"></div>
+
+    <div class="bear-wrap" id="bearWrap">
+      <div class="bear">
+        <div class="ear left"></div><div class="ear right"></div>
+        <div class="head"><div class="face"><div class="eye left"></div><div class="eye right"></div><div class="nose"></div></div></div>
+        <div class="body"></div>
+        <div class="arm"><div class="paw"></div><div class="envelope" id="envelope"><div class="flap"></div><div class="paper"></div></div></div>
+        <div class="leg left"></div><div class="leg right"></div>
+        <div class="shadow"></div>
+      </div>
+      <div class="speech" id="speech">Ada surat nih, ambil (tekan) dong 💌</div>
+    </div>
+
+    <div class="bear-side" id="bearSide">
+      <div style="width:120px;height:150px;background:var(--brown);border-radius:30px;"></div>
+    </div>
+
+    <div class="letter-sheet" id="sheet">
+      <div class="sheet-title">Untuk nyonya Novita 💌</div>
+      <div class="sheet-body" id="sheetBody"></div>
+    </div>
+
+    <!-- audio -->
+    <audio id="bgMusic" src="Bergema Sampai Selamanya.mp3"></audio>
+  </div>
+
+  <script>
+    const suratText = `Halo nyonya,
+Apa kabar? Semoga anda selalu dalam keadaan baik dan bahagia.
+
+Sebelumnya, saya ingin meminta maaf lagi atas keputusan yang sudah saya buat. Setelah saya pikirkan matang-matang, rehat sejenak ini ternyata cukup baik untuk kita, nyonya (bukan karena masalah kemarin ya). Saya sadar bahwa hubungan itu tidak selalu berjalan lurus tanpa rintangan. Justru saya takut kalau kita terlalu terbiasa, muncul rasa bosan hingga hubungan kita jadi hambar dan malah benar-benar selesai.
+
+Karena itu, saya berharap nanti ketika kita kembali berkomunikasi, hubungan kita bisa terasa lebih indah, lebih matang, dan lebih sempurna dari sebelumnya, hehe.
+
+Dan walaupun belum sebulan, saya sudah sangat merindukan anda, nyonya. Rasanya tidak sabar menanti akhir bulan Oktober nanti. Semoga waktu cepat berlalu, karena rinduku ini semakin hari semakin besar… awooooh awooooh....
+
+Alhamdulillah, di sini saya baik-baik saja, rutinitasnya ya gitu-gitu aja: makan, tidur, ngaji, ngajar, ngising, dan lain-lain hahaha. Ustadz yang kemarin juga sudah ada di sini, tapi saya belum sempat ketemu, jadi belum tahu gimana reaksinya nanti kalau ngobrol sama dia (mudah-mudahan malah disuruh nikah, khikhikhi).
+
+Sekarang saya juga lagi fokus ngelancarin 15 juz, sambil berusaha keras ngelawan hawa nafsu. Jujur ini berat sekali, nyonya. Kalau saya kalah sama hawa nafsu, jadi gampang malas: rencana olahraga malah berubah jadi scrolling, niat belajar malah jadi tidur. Menyebalkan sekali rasanya huhuhu.
+
+Jadi doain saya ya, nyonya, semoga bisa jadi lebih baik lagi. Karena setelah saya pikir-pikir, saya baru berani datang menemui anda kalau saya sudah mapan dan punya fisik yang bagus hehe.
+
+Dan terakhir, nyonya…
+Terima kasih ya sudah sabar dengan saya. Anda itu alasan kenapa saya semangat berubah jadi lebih baik. Semoga nanti saat kita mulai komunikasi lagi, saya bisa hadir dengan versi terbaik—lebih dewasa, lebih siap, dan bisa bikin anda bangga. Sampai saat itu tiba, jaga diri anda baik-baik ya… karena saya di sini juga selalu jaga hati buat anda nyonya. ❤️`;
+
+    const bearWrap = document.getElementById('bearWrap');
+    const envelope = document.getElementById('envelope');
+    const sheet = document.getElementById('sheet');
+    const sheetBody = document.getElementById('sheetBody');
+    const bearSide = document.getElementById('bearSide');
+    const bgMusic = document.getElementById('bgMusic');
+
+    setTimeout(() => {
+      bearWrap.classList.add('walk-in');
+    }, 700);
+
+    envelope.addEventListener('click', function(){
+      envelope.classList.add('open');
+      setTimeout(()=>{
+        sheet.classList.add('show');
+        bearSide.classList.add('show');
+        sheetBody.innerText = suratText; // langsung muncul penuh
+        bearWrap.style.opacity = 0;
+        bgMusic.play(); // mainkan musik
+      }, 520);
+    });
+  </script>
+</body>
+</html>
